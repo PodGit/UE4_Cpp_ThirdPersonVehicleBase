@@ -6,7 +6,7 @@
 
 UTPWheelFront::UTPWheelFront()
 {
-	ShapeRadius = 18.f;
+	ShapeRadius = 30.f;
 	ShapeWidth = 15.0f;
 	bAffectedByHandbrake = false;
 	SteerAngle = 40.f;

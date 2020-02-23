@@ -6,7 +6,7 @@
 
 UTPWheelRear::UTPWheelRear()
 {
-	ShapeRadius = 18.0f;
+	ShapeRadius = 30.0f;
 	ShapeWidth = 15.0f;
 	bAffectedByHandbrake = true;
 	SteerAngle = 0.f;

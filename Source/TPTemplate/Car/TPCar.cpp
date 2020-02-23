@@ -182,10 +182,15 @@ ATPCar::ATPCar()
 void ATPCar::DriverEnter(ATPCharacter* NewDriver)
 {
 	Driver = NewDriver;
+	Driver->SetActorHiddenInGame(true);
+	Driver->SetActorEnableCollision(false);
 }
 
 void ATPCar::DriverLeave()
 {
+	Driver->SetActorLocation(GetActorLocation() + GetActorRightVector() * 200.0f + GetActorUpVector() * 50.0f);
+	Driver->SetActorHiddenInGame(false);
+	Driver->SetActorEnableCollision(true);
 	GetController()->Possess(Driver);
 	Driver = nullptr;
 }
