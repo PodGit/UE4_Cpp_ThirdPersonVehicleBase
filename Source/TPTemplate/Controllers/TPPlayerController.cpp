@@ -20,6 +20,10 @@ void ATPPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Jump", IE_Pressed,	this, &ATPPlayerController::Jump);
 	InputComponent->BindAction("Jump", IE_Released, this, &ATPPlayerController::StopJumping);
 
+	InputComponent->BindAction("Handbrake", IE_Pressed, this, &ATPPlayerController::OnHandbrakePressed);
+	InputComponent->BindAction("Handbrake", IE_Released, this, &ATPPlayerController::OnHandbrakeReleased);
+	InputComponent->BindAction("SwitchCamera", IE_Pressed, this, &ATPPlayerController::OnToggleCamera);
+
 	InputComponent->BindAxis("MoveForward", this, &ATPPlayerController::MoveForward);
 	InputComponent->BindAxis("MoveRight",	this, &ATPPlayerController::MoveRight);
 
@@ -27,6 +31,8 @@ void ATPPlayerController::SetupInputComponent()
 	InputComponent->BindAxis("LookRightRate",	this, &ATPPlayerController::TurnAtRate);
 	InputComponent->BindAxis("LookUp",			this, &ATPPlayerController::AddControllerPitchInput);
 	InputComponent->BindAxis("LookUpRate",		this, &ATPPlayerController::LookUpAtRate);
+
+	InputComponent->BindAction("EnterVehicle", IE_Released, this, &ATPPlayerController::EnterVehicle);
 }
 
 void ATPPlayerController::OnPossess(APawn* InPawn)
@@ -37,6 +43,12 @@ void ATPPlayerController::OnPossess(APawn* InPawn)
 	{
 		TPCharacter = Cast<ATPCharacter>(GetCharacter());
 	}
+	else
+	{
+		TPCharacter = nullptr;
+	}
+
+	Car = Cast<ATPCar>(InPawn);
 }
 
 void ATPPlayerController::Jump()
@@ -55,11 +67,39 @@ void ATPPlayerController::StopJumping()
 	}
 }
 
+void ATPPlayerController::OnHandbrakePressed()
+{
+	if (Car)
+	{
+		Car->OnHandbrakePressed();
+	}
+}
+
+void ATPPlayerController::OnHandbrakeReleased()
+{
+	if (Car)
+	{
+		Car->OnHandbrakeReleased();
+	}
+}
+
+void ATPPlayerController::OnToggleCamera()
+{
+	if (Car)
+	{
+		Car->OnToggleCamera();
+	}
+}
+
 void ATPPlayerController::MoveForward(float Value)
 {
 	if (TPCharacter)
 	{
 		TPCharacter->MoveForward(Value);
+	}
+	else if(Car)
+	{
+		Car->MoveForward(Value);
 	}
 }
 
@@ -69,13 +109,17 @@ void ATPPlayerController::MoveRight(float Value)
 	{
 		TPCharacter->MoveRight(Value);
 	}
+	else if (Car)
+	{
+		Car->MoveRight(Value);
+	}
 }
 
 void ATPPlayerController::AddControllerYawInput(float Value)
 {
 	if (GetPawn())
 	{
-		GetCharacter()->AddControllerYawInput(Value);
+		GetPawn()->AddControllerYawInput(Value);
 	}
 }
 
@@ -100,5 +144,17 @@ void ATPPlayerController::LookUpAtRate(float Value)
 	if (TPCharacter)
 	{
 		TPCharacter->LookUpAtRate(Value);
+	}
+}
+
+void ATPPlayerController::EnterVehicle()
+{
+	if (TPCharacter)
+	{
+		TPCharacter->EnterVehicle();
+	}
+	else if (Car)
+	{
+		Car->DriverLeave();
 	}
 }

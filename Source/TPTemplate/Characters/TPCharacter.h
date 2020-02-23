@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "TPCharacter.generated.h"
 
+class USphereComponent;
+class ATPCar;
+
 UCLASS(config=Game)
 class ATPCharacter : public ACharacter
 {
@@ -18,6 +21,10 @@ class ATPCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
+	/** Follow camera */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Vehicles, meta = (AllowPrivateAccess = "true"))
+	class USphereComponent* VehicleDetectionSphere;
 public:
 	ATPCharacter();
 
@@ -47,6 +54,12 @@ public:
 	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
 	 */
 	void LookUpAtRate(float Rate);
+
+	void EnterVehicle();
+
+private:
+
+	ATPCar* GetClosestCarInRange();
 
 protected:
 

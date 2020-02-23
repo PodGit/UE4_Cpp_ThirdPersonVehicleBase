@@ -4,6 +4,7 @@
 #include "TPWheelFront.h"
 #include "TPWheelRear.h"
 #include "TPCar.h"
+#include "TPTemplate/Characters/TPCharacter.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -36,6 +37,7 @@ const FName ATPCar::EngineAudioRPM("RPM");
 #define LOCTEXT_NAMESPACE "VehiclePawn"
 
 ATPCar::ATPCar()
+	: Driver(nullptr)
 {
 	// Car mesh
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CarMesh(TEXT("/Game/VehicleAdv/Vehicle/Vehicle_SkelMesh.Vehicle_SkelMesh"));
@@ -177,23 +179,15 @@ ATPCar::ATPCar()
 	bInReverseGear = false;
 }
 
-void ATPCar::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+void ATPCar::DriverEnter(ATPCharacter* NewDriver)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	Driver = NewDriver;
+}
 
-	// set up gameplay key bindings
-	check(PlayerInputComponent);
-
-	PlayerInputComponent->BindAxis("MoveForward", this, &ATPCar::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &ATPCar::MoveRight);
-	PlayerInputComponent->BindAxis(LookUpBinding);
-	PlayerInputComponent->BindAxis(LookRightBinding);
-
-	PlayerInputComponent->BindAction("Handbrake", IE_Pressed, this, &ATPCar::OnHandbrakePressed);
-	PlayerInputComponent->BindAction("Handbrake", IE_Released, this, &ATPCar::OnHandbrakeReleased);
-	PlayerInputComponent->BindAction("SwitchCamera", IE_Pressed, this, &ATPCar::OnToggleCamera);
-
-	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ATPCar::OnResetVR); 
+void ATPCar::DriverLeave()
+{
+	GetController()->Possess(Driver);
+	Driver = nullptr;
 }
 
 void ATPCar::MoveForward(float Val)

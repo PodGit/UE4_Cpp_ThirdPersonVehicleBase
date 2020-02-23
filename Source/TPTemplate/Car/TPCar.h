@@ -6,6 +6,7 @@
 #include "WheeledVehicle.h"
 #include "TPCar.generated.h"
 
+class ATPCharacter;
 class UPhysicalMaterial;
 class UCameraComponent;
 class USpringArmComponent;
@@ -76,10 +77,6 @@ public:
 	/** Initial offset of incar camera */
 	FVector InternalCameraOrigin;
 
-	// Begin Pawn interface
-	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
-	// End Pawn interface
-
 	// Begin Actor interface
 	virtual void Tick(float Delta) override;
 protected:
@@ -87,6 +84,8 @@ protected:
 
 public:
 	// End Actor interface
+	void DriverEnter(ATPCharacter* NewDriver);
+	void DriverLeave();
 
 	/** Handle pressing forwards */
 	void MoveForward(float Val);
@@ -113,6 +112,9 @@ public:
 	static const FName EngineAudioRPM;
 
 private:
+
+	ATPCharacter* Driver;
+
 	/** 
 	 * Activate In-Car camera. Enable camera and sets visibility of incar hud display
 	 *

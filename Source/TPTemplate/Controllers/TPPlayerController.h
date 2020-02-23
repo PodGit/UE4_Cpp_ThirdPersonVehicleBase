@@ -33,6 +33,12 @@ private:
 	void AddControllerPitchInput(float Value);
 	void LookUpAtRate(float Value);
 
+	void EnterVehicle();
+	void OnToggleCamera();
+
+	void OnHandbrakePressed();
+	void OnHandbrakeReleased();
+
 private :
 	UPROPERTY()
 	ATPCar* Car;

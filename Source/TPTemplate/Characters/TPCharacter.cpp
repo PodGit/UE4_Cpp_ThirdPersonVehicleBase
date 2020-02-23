@@ -5,9 +5,11 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/SphereComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "TPTemplate/Car/TPCar.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ATPCharacter
@@ -43,13 +45,12 @@ ATPCharacter::ATPCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	VehicleDetectionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("VehicleDetection"));
+	VehicleDetectionSphere->SetupAttachment(RootComponent);
+	VehicleDetectionSphere->InitSphereRadius(300.0f);
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
-
-//////////////////////////////////////////////////////////////////////////
-// Input
-
 
 void ATPCharacter::OnResetVR()
 {
@@ -105,4 +106,38 @@ void ATPCharacter::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
+}
+
+void ATPCharacter::EnterVehicle()
+{
+	ATPCar* Car = GetClosestCarInRange();
+
+	if (Car)
+	{
+		Car->DriverEnter(this);
+		GetController()->Possess(Car);
+	}
+}
+
+ATPCar* ATPCharacter::GetClosestCarInRange()
+{
+	TArray<AActor*> ActorsInRange;
+	VehicleDetectionSphere->GetOverlappingActors(ActorsInRange, TSubclassOf<ATPCar>());
+	ATPCar* ClosestCar = nullptr;
+	float ClosestDistance = MAX_FLT;
+
+	for (int ActorIdx = 0; ActorIdx < ActorsInRange.Num(); ++ActorIdx)
+	{
+		if (ATPCar* Car = Cast<ATPCar>(ActorsInRange[ActorIdx]))
+		{
+			float ThisDistance = FVector::Dist(GetActorLocation(), Car->GetActorLocation());
+			if (ThisDistance < ClosestDistance)
+			{
+				ClosestCar = Car;
+				ClosestDistance = ThisDistance;
+			}
+		}
+	}
+
+	return ClosestCar;
 }
